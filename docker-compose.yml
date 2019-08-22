@@ -1,0 +1,19 @@
+
+version: '3'
+
+services:
+  web:
+    image: node:10.11
+    volumes:
+      - ./:/app
+    working_dir: /app
+    environment:
+      - DATABASE_URL=postgresql://postgres:toor@db:3211/plus
+    entrypoint: node index.js
+    links:
+      - db
+  db:
+    image: postgres:10
+    environment:
+      - POSTGRES_PASSWORD=toor
+      - POSTGRES_DB=plus

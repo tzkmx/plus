@@ -1,0 +1,55 @@
+
+# Travis CI configuration for Working PlusPlus++
+#
+# @see https://docs.travis-ci.com/user/languages/javascript-with-nodejs/
+# @see https://docs.travis-ci.com/user/database-setup/#postgresql
+# @author Tim Malone <tdmalone@gmail.com>
+
+language: node_js
+node_js: 10.11.0
+
+services:
+  - postgresql
+
+# Support upgrading to PostgreSQL 10, as the default build images don't support it yet.
+# (We run the install script in before_install below)
+# @see https://github.com/travis-ci/travis-ci/issues/8537#issuecomment-354020356
+sudo: required
+addons:
+  postgresql: 9.6
+
+cache:
+  yarn: true
+  directories:
+    - node_modules
+
+before_install:
+
+  # Upgrade Yarn to the version specified in package.json.
+  - curl --location https://yarnpkg.com/install.sh | bash -s -- --version "$( node -e "console.log(require('./package.json').engines.yarn)" )"
+  - export PATH="$HOME/.yarn/bin:$PATH"
+
+  # Upgrade to PostgreSQL 10.
+  - ./.travis-postgres10.sh
+
+install:
+  - yarn --frozen-lockfile
+
+before_script:
+  - psql --command="CREATE DATABASE plusplus_tests;" --username="postgres"
+
+script:
+  - yarn lint
+  - yarn test
+
+after_script:
+  - yarn report-coverage
+
+# On success, deployments are automatically handled by Heroku.
+
+notifications:
+  email: false
+  slack:
+    on_start: always
+    rooms:
+      - secure: APCruNsLlD5TMbj92NY4MNIBCoSswEQwisK12tbJEMkdBecPK1y7J8sqgOzxuCSmDD3L5jE17HYeU5tBWxOPYwD8YOo3TIKKPCSDl7QpGXcCKa5G/juOpCAWSgMK7UOvFfs9Df04+kP7y6X9uD7lLer2C5RtqMidN68Ye0jufekvVrM8FVjY/d4Dg5MDqdSe2QJq4fK9fj5d1+YbNkVi6aaAZM3fs03C5jkIgmcWDK1ttrQohaYlYdI5DJonLh8tV6rdSA1dqWAavztx+gr3N0gj/6BVLnDUvRT7nLEAFQQBlI0YzzmEk2xvwV+4m5K8iC3kT2A4giVqeeYyIoxE2Cautr2wi+jUbcufJHuoR3iaDUNy9v+z/aOydI6I9sOrbIgKSVkQQBwe+GpIyBiCDQeBhi/QfsBEBd+gzPHKGsbvins+BWWP4RpnaxxFRtrcoKi3AstjGOH4nT95xFMYI6RSe+9RV9ajvbs20SN7LLOBnPWx20G0Uq2sTJpzWjyrAlQ/THNb7cj+bgMjoybxRheWw5JWs8RJ5Rt9ElKu55n9SpSNcO676rXIa1nJ8WjMSQNTIYF/cYHRVVyDrIUQATDM6oRGvTkTOc37uWMJtOqDpkpbTw/ySjiMRsp9m50yDNPDxet/Dyboau63LIh6IyWC85HKzHVdHq/dgkFU1UE=

@@ -1,0 +1,7 @@
+coverage
+docs
+node_modules
+*.log
+package-lock.json
+.coveralls.yml
+.env

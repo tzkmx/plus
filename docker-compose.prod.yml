@@ -1,0 +1,26 @@
+
+version: '3'
+
+networks:
+  proxy:
+    external:
+      name: proxy
+  internal:
+    driver: bridge
+    external: false
+
+services:
+  web:
+    labels:
+      - traefik.backend=
+      - traefik.docker.network=proxy
+      - traefik.frontend.rule=
+      - traefik.enable=true
+      - traefik.port=80
+      - traefik.frontend.entryPoints=http,https
+
+  db:
+    networks:
+      - internal
+    labels:
+      - traefik.enable=false
