@@ -17,3 +17,6 @@ services:
     environment:
       - POSTGRES_PASSWORD=toor
       - POSTGRES_DB=plus
+      - SLACK_VERIFICATION_TOKEN=
+      - SLACK_BOT_USER_OAUTH_ACCESS_TOKEN=
+      - YARN_PRODUCTION=true
