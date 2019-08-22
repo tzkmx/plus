@@ -18,6 +18,9 @@ services:
       - traefik.enable=true
       - traefik.port=80
       - traefik.frontend.entryPoints=http,https
+    networks:
+      - internal
+      - proxy
 
   db:
     networks:

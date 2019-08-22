@@ -4,19 +4,23 @@ version: '3'
 services:
   web:
     image: node:10.11
+    expose:
+      - 80
     volumes:
       - ./:/app
     working_dir: /app
     environment:
-      - DATABASE_URL=postgresql://postgres:toor@db:3211/plus
+      - DATABASE_URL=postgresql://postgres:toor@db:5432/plus
+      - SLACK_VERIFICATION_TOKEN=
+      - SLACK_BOT_USER_OAUTH_ACCESS_TOKEN=
+      - YARN_PRODUCTION=true
+      - DATABASE_USE_SSL=false
     entrypoint: node index.js
     links:
       - db
+
   db:
     image: postgres:10
     environment:
       - POSTGRES_PASSWORD=toor
       - POSTGRES_DB=plus
-      - SLACK_VERIFICATION_TOKEN=
-      - SLACK_BOT_USER_OAUTH_ACCESS_TOKEN=
-      - YARN_PRODUCTION=true
